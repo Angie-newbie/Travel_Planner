@@ -23,3 +23,6 @@ def seed_tables():
             email = 'john.smith@outlook.com'
         )
     ]
+
+    db.session.add_all(users)
+    db.session.commit()

@@ -5,7 +5,7 @@ from models.users import User, one_user, many_users
 users_bp = Blueprint('users', __name__)
 
 # Read all - GET /students
-@users_bp.route('/users')
+@users_bp.route('/users', methods=['GET'])
 def get_all_users():
     stmt = db.select(User).order_by(User.name.desc())
     users = db.session.scalars(stmt)
