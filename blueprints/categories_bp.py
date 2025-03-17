@@ -6,18 +6,38 @@ from models.categories import Category, one_category, many_categories, category_
 
 categories_bp = Blueprint('categories', __name__)
 
+# Helper function to fetch all categories
+def get_all_categories_from_db():
+    stmt = db.select(Category).order_by(Category.name.desc())
+    return db.session.scalars(stmt)
+
+# Helper function to fetch category by id
+def get_category_by_id(category_id):
+    stmt = db.select(Category).filter_by(id=category_id)
+    return db.session.scalar(stmt)
+
+# Helper function to check if category name exists (excluding the current category)
+def is_category_name_exists(name, exclude_id=None):
+    existing_category = db.session.query(Category).filter_by(name=name).first()
+    return existing_category and (existing_category.id != exclude_id if exclude_id else True)
+
+# Helper function to handle integrity errors
+def handle_integrity_error(err):
+    if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
+        return {"error": "Category name already in use"}, 409
+    else:
+        return {"error": err._message()}, 400
+
 # Read all 
 @categories_bp.route('/categories', methods=['GET'])
 def get_all_categories():
-    stmt = db.select(Category).order_by(Category.name.desc())
-    categories = db.session.scalars(stmt)
+    categories = get_all_categories_from_db()
     return many_categories.dump(categories)
 
 # Read one
 @categories_bp.route('/categories/<int:category_id>')
 def get_one_category(category_id):
-    stmt = db.select(Category).filter_by(id = category_id)
-    category = db.session.scalar(stmt)
+    category = get_category_by_id(category_id)
     if category:
         return one_category.dump(category)
     else:
@@ -29,16 +49,18 @@ def update_category(category_id):
     try:
         
         # Fetch category by id
-        stmt = db.select(Category).filter_by(id = category_id)
-        category = db.session.scalar(stmt)
+        category = get_category_by_id(category_id)
         if category:
             # Pre-check if 'id' is present in the incoming data and remove it
             incoming_data = request.json
-            if 'id' in incoming_data:
-                del incoming_data['id']  # Remove 'id' from the data
+            incoming_data.pop('id', None) 
 
             # Get incoming request body
             data = category_without_id.load(request.json)
+
+            # Check if the new category name already exists (to enforce uniqueness)
+            if is_category_name_exists(data.get('name'), exclude_id=category.id):
+                return {"error": "Category name already in use."}, 409
 
             # update the attribute of the category with the incoming data
             category.name = data.get('name') or category.name
@@ -48,10 +70,7 @@ def update_category(category_id):
         else:
             return {'error': f'Category with id {category_id} does not exist'}, 404 
     except IntegrityError as err:
-        if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
-            return{"error": "categpry name already in use"}, 409
-        else:
-            return{"error": err._message()}, 400
+        return handle_integrity_error(err)
         
 # Create - POST
 @categories_bp.route('/categories', methods = ['POST'])
@@ -62,6 +81,10 @@ def create_category():
 
         if not data.get('name'):
             return {"error": "'name' field is required"}, 400
+        
+        # Pre-check if the category name already exists
+        if is_category_name_exists(data.get('name')):
+            return {"error": "Category name already exists."}, 409
         
         new_category = Category(
             name = data.get('name'),
@@ -74,17 +97,12 @@ def create_category():
         # Return the new category instance 
         return one_category.dump(new_category), 201
     except IntegrityError as err:
-        if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION: 
-            # unique violation
-            return {"error": "category name already in use"}, 409
-        else:
-            return{"error": err._message()}, 400
+        return handle_integrity_error(err)
 
 # Delete - DELETE
 @categories_bp.route('/categories/<int:category_id>', methods = ['DELETE'])
 def delete_category(category_id):
-    stmt = db.select(Category).filter_by(id = category_id)
-    category = db.session.scalar(stmt)
+    category = get_category_by_id(category_id)
     if category:
         db.session.delete(category)
         db.session.commit()
