@@ -20,3 +20,4 @@ class UserSchema(ma.Schema):
 
 one_user = UserSchema()
 many_users = UserSchema(many = True)
+user_without_id = UserSchema(exclude=['id'])
