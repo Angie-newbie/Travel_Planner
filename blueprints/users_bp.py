@@ -40,7 +40,6 @@ def update_user(user_id):
             # Get incoming request body
             data = user_without_id.load(request.json)
 
-            
             # update the attribute of the user with the incoming data
             user.name = data.get('name') or user.name
             user.email = data.get('email') or user.email
@@ -52,6 +51,36 @@ def update_user(user_id):
     except IntegrityError as err:
         if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
             return{"error": "email address already in use"}, 409
+        else:
+            return{"error": err._message()}, 400
+        
+# Create - POST
+@users_bp.route('/users', methods = ['POST'])
+def create_user():
+    try:
+        # Get incoming request body(json)
+        data = user_without_id.load(request.json)
+
+        # Validate that 'name' and 'email' are provided in the request
+        if not data.get('name'):
+            return {"error": "'name' field is required"}, 400
+        if not data.get('email'):
+            return {"error": "'email' field is required"}, 400
+        
+        new_user = User(
+            name = data.get('name'),
+            email = data.get('email')
+        )
+        # Add the instance to the db session
+        db.session.add(new_user)
+        # Commit the session
+        db.session.commit()
+        # Return the new user instance 
+        return one_user.dump(new_user), 201
+    except IntegrityError as err:
+        if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION: 
+            # unique violation
+            return {"error": "email address already in use"}, 409
         else:
             return{"error": err._message()}, 400
     
