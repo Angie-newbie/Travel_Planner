@@ -5,6 +5,7 @@ import os
 from blueprints.database_bp import db_bp
 from blueprints.users_bp import users_bp
 from blueprints.categories_bp import categories_bp
+from blueprints.trips_bp import trips_bp
 
 def create_app():
     app = Flask(__name__)
@@ -18,5 +19,6 @@ def create_app():
     app.register_blueprint(db_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(categories_bp)
+    app.register_blueprint(trips_bp)
 
     return app

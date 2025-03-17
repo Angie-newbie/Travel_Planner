@@ -3,6 +3,7 @@ from init import db
 from datetime import date
 from models.users import User
 from models.categories import Category
+from models.trips import Trip
 
 db_bp = Blueprint('db', __name__)
 
@@ -35,7 +36,20 @@ def seed_tables():
         )
     ]
     
+    trips = [
+        Trip(
+            location = 'Japan',
+            arrival_date = 
+            departure_date = 
+            user_id = 
+            total_expense
+        ),
+        Trip( 
+            name = 'Shopping',
+        )
+    ]
 
     db.session.add_all(users)
     db.session.add_all(cateogories)
+    db.session.add_all(trips)
     db.session.commit()

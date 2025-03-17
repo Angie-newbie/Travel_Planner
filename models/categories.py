@@ -10,7 +10,6 @@ class Category(db.Model):
 
                         
 class CategorySchema(ma.Schema):
-
     class Meta:
         fields = ('id', 'name')
 
