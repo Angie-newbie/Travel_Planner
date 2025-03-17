@@ -3,7 +3,7 @@ from marshmallow.fields import Email
 
 class User(db.Model):
     __tablename__ = 'users'
-    __table_args__ = {'schema': 'academy'} 
+    __table_args__ = {'schema': 'travel'} 
 
 
     id = db.Column(db.Integer, primary_key = True)

@@ -2,10 +2,12 @@ from flask import Blueprint
 from init import db
 from datetime import date
 from models.users import User
+from models.categories import Category
 
 db_bp = Blueprint('db', __name__)
 
 @db_bp.cli.command('init')
+
 def create_tables():
     db.drop_all()
     db.create_all()
@@ -24,5 +26,16 @@ def seed_tables():
         )
     ]
 
+    cateogories = [
+        Category(
+            name = 'Food',
+        ),
+        Category( 
+            name = 'Shopping',
+        )
+    ]
+    
+
     db.session.add_all(users)
+    db.session.add_all(cateogories)
     db.session.commit()
