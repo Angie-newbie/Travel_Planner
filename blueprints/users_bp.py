@@ -83,4 +83,17 @@ def create_user():
             return {"error": "email address already in use"}, 409
         else:
             return{"error": err._message()}, 400
+
+# Delete - DELETE
+@users_bp.route('/users/<int:user_id>', methods = ['DELETE'])
+def delete_user(user_id):
+    stmt = db.select(User).filter_by(id = user_id)
+    user = db.session.scalar(stmt)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+        return {'message': f'User with id {user_id} has been deleted successfully'}, 200
+    else:
+        return {'error': f'User with id {user_id} does not exist'}, 404
+
     
