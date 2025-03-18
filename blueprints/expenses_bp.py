@@ -8,7 +8,7 @@ expenses_bp = Blueprint('expenses', __name__)
 
 # Helper function to fetch all expenses
 def get_all_expenses_from_db():
-    stmt = db.select(Expense).order_by(Expense.name.desc())
+    stmt = db.select(Expense).order_by(Expense.amount.desc())
     return db.session.scalars(stmt)
 
 # Helper function to fetch expense by id
@@ -23,9 +23,6 @@ def is_expense_name_exists(name, exclude_id=None):
 
 # Helper function to handle integrity errors
 def handle_integrity_error(err):
-    if err.orig.pgcode == errorcodes.UNIQUE_VIOLATION:
-        return {"error": "Expenses name already in use"}, 409
-    else:
         return {"error": err._message()}, 400
 
 # Read all 

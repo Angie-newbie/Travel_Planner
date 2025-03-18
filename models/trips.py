@@ -21,7 +21,7 @@ class Trip(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('travel.users.id'), nullable=False)
     user = db.relationship('User', back_populates='user_trips')
     # Define relationship with Expense
-    expenses = db.relationship("Expense", back_populates="trip",lazy="dynamic")
+    expenses = db.relationship("Expense", back_populates="trip_location",lazy="dynamic")
 
     def total_expense(self):
         return db.session.query(db.func.sum(Expense.amount)).filter(Expense.trip_id == self.id).scalar() or 0

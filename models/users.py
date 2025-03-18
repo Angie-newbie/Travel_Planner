@@ -16,7 +16,7 @@ class User(db.Model):
                         
 class UserSchema(ma.Schema):
     email = Email(required=True)
-    user_trips = fields.Nested('TripSchema', many=True, only=['id', 'location']) 
+    user_trips = fields.Nested('TripSchema', many=True, only=['location', 'total_expense']) 
 
     class Meta:
         include_fk = True 

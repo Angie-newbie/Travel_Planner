@@ -15,18 +15,18 @@ class Expense(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('travel.categories.id'))
 
     # Define relationships
-    trip = db.relationship("Trip", back_populates="expenses")
+    trip_location = db.relationship("Trip", back_populates="expenses")
     category = db.relationship("Category", back_populates="expenses")
                         
 class ExpenseSchema(ma.Schema):
     description = String(validate=Length(min=2, error="Description must be at least 2 characters"))
 
     # Nested fields
-    trip = fields.Nested('TripSchema', only=['id', 'location'])
-    category = fields.Nested('CategorySchema', only=['id', 'name'])
+    trip_location = fields.Nested('TripSchema', only=['location'])
+    category = fields.Nested('CategorySchema', only=['name'])
 
     class Meta:
-        fields = ('id', 'amount', 'description', 'trip_id', 'category_id')
+        fields = ('id', 'amount', 'description', 'trip_location', 'category')
 
 one_expense = ExpenseSchema()
 many_expenses = ExpenseSchema(many = True)

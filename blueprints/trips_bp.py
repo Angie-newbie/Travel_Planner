@@ -124,6 +124,6 @@ def delete_trip(trip_id):
     if trip:
         db.session.delete(trip)
         db.session.commit()
-        return {}, 204
+        return {'message': f'Trip with id {trip_id} has been deleted successfully'}, 200
     else:
         return {'error': f'Trip with id {trip_id} does not exist'}, 404
