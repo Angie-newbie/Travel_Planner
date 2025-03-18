@@ -6,6 +6,7 @@ from blueprints.database_bp import db_bp
 from blueprints.users_bp import users_bp
 from blueprints.categories_bp import categories_bp
 from blueprints.trips_bp import trips_bp
+from blueprints.expenses_bp import expenses_bp
 
 def create_app():
     app = Flask(__name__)
@@ -20,5 +21,6 @@ def create_app():
     app.register_blueprint(users_bp)
     app.register_blueprint(categories_bp)
     app.register_blueprint(trips_bp)
+    app.register_blueprint(expenses_bp)
 
     return app

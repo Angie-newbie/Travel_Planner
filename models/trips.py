@@ -3,6 +3,7 @@ from marshmallow_sqlalchemy import fields
 from marshmallow.fields import String
 from sqlalchemy.orm import column_property
 from sqlalchemy.sql import func
+from models.expenses import Expense
 
 
 
@@ -18,11 +19,11 @@ class Trip(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey('travel.users.id'), nullable=False)
     
-    total_expense = column_property(
-        db.select(func.coalesce(func.sum(Expense.amount), 0))
-        .where(Expense.trip_id == id)
-        .scalar_subquery()
-    )
+    # Define relationship with Expense
+    expenses = db.relationship("Expense", back_populates="trip")
+
+    def total_expense(self):
+        return db.session.query(func.coalesce(func.sum(Expense.amount), 0)).filter(Expense.trip_id == self.id).scalar()
                         
 class TripSchema(ma.Schema):
     location = String(required=True)
