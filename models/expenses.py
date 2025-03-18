@@ -26,7 +26,7 @@ class ExpenseSchema(ma.Schema):
     category = fields.Nested('CategorySchema', only=['id', 'name'])
 
     class Meta:
-        fields = ('id', 'amount', 'discription', 'trip_id', 'category_id')
+        fields = ('id', 'amount', 'description', 'trip_id', 'category_id')
 
 one_expense = ExpenseSchema()
 many_expenses = ExpenseSchema(many = True)

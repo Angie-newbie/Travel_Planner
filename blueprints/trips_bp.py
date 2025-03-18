@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from sqlalchemy.exc import IntegrityError
 from psycopg2 import errorcodes
 from init import db
+from models.users import User
 from models.trips import Trip, many_trips, one_trip, trip_without_id
 
 trips_bp = Blueprint('trips', __name__)
@@ -9,7 +10,7 @@ trips_bp = Blueprint('trips', __name__)
 # Read all - GET /trips
 @trips_bp.route('/trips')
 def get_all_trips():
-    stmt = db.select(Trip).order_by(Trip.name.desc())
+    stmt = db.select(Trip).order_by(Trip.location.desc())
     trips = db.session.scalars(stmt)
     return many_trips.dump(trips)
 
@@ -30,12 +31,12 @@ def create_trip():
     try:
         # Get incoming request body(json)
         data = trip_without_id.load(request.json)
-        # Create a new instance of trip modelc
+
         new_trip = Trip(
-            name = data.get('name'),
-            start_date = data.get('start_date'),
-            end_date = data.get('end_date'),
-            teacher_id = data.get('teacher_id')
+            location = data.get('location'),
+            departure_date = data.get('departure_date'),
+            arrival_date = data.get('arrival_date'),
+            user_id = data.get('user_id')
         )
         # Add the instance to the db session
         db.session.add(new_trip)
@@ -46,8 +47,6 @@ def create_trip():
     except Exception as err:
             return{"error": str(err)}, 400
 
-
-    
 
 # Update - PUT / trips / <int:id>
 @trips_bp.route('/trips/<int:trip_id>', methods = ['PUT', 'PATCH'])
@@ -61,10 +60,10 @@ def update_trip(trip_id):
             # Get incoming request body
             data = trip_without_id.load(request.json)
             # update the attribute of the trip with the incoming data
-            trip.name = data.get('name') or trip.name
-            trip.start_date = data.get('start_date') or trip.start_date
-            trip.end_date = data.get('end_date') or trip.end_date
-            trip.teacher_id = data.get('teacher_id', trip.teacher_id)
+            trip.location = data.get('location') or trip.location
+            trip.departure_date = data.get('departure_date') or trip.departure_date
+            trip.arrival_date = data.get('arrival_date') or trip.arrival_date
+            trip.user_id = data.get('user_id', trip.user_id)
 
             db.session.commit()
             return one_trip.dump(trip)

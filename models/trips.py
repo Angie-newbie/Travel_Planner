@@ -1,9 +1,9 @@
 from init import db, ma
-from marshmallow_sqlalchemy import fields
-from marshmallow.fields import String
+from marshmallow import Schema, fields
 from sqlalchemy.orm import column_property
 from sqlalchemy.sql import func
 from models.expenses import Expense
+from models.users import User
 
 
 
@@ -17,16 +17,25 @@ class Trip(db.Model):
     arrival_date = db.Column(db.Date, nullable = False)
     departure_date = db.Column(db.Date, nullable = False)
 
+    # Define relationship with User
     user_id = db.Column(db.Integer, db.ForeignKey('travel.users.id'), nullable=False)
-    
+    user = db.relationship('User', back_populates='user_trips')
     # Define relationship with Expense
     expenses = db.relationship("Expense", back_populates="trip")
 
     def total_expense(self):
-        return db.session.query(func.coalesce(func.sum(Expense.amount), 0)).filter(Expense.trip_id == self.id).scalar()
+        return sum(expense.amount for expense in self.expenses)
                         
 class TripSchema(ma.Schema):
-    location = String(required=True)
+    id = fields.Int()
+    location = fields.Str()
+    arrival_date = fields.Date()
+    departure_date = fields.Date()
+    user_id = fields.Int()
+    total_expense = fields.Method("get_total_expense")
+
+    def get_total_expense(self, obj):
+        return obj.total_expense
 
 
     class Meta:

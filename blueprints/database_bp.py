@@ -27,6 +27,8 @@ def seed_tables():
             email = 'john.smith@outlook.com'
         )
     ]
+    db.session.add_all(users)
+    db.session.commit() 
 
     categories = [
         Category(
@@ -37,35 +39,37 @@ def seed_tables():
         )
     ]
     
+    db.session.add_all(categories)
+    db.session.commit() 
     trips = [
         Trip(
             location = 'Japan',
             arrival_date = date(2025, 4, 8),
             departure_date = date(2025, 4, 20),
-            user_id=users[1]
+            user_id=1
         ),
         Trip( 
             location = 'Korea',
             arrival_date = date(2025, 3, 26),
             departure_date = date(2025, 4, 8),
-            user_id=users[1]
+            user_id=1
         )
     ]
 
     expenses = [
         Expense(
             amount = 100, 
-            discription = "Ramen",
+            description = "Ramen",
             trip=trips[0], 
             category=categories[0]
         ),
         Expense( 
             amount = 100, 
-            discription = "Bag"
+            description = "Bag"
         )
     ]
 
-    db.session.add_all(users)
-    db.session.add_all(categories)
+
     db.session.add_all(trips)
+    db.session.add_all(expenses)
     db.session.commit()
