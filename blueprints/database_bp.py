@@ -65,7 +65,9 @@ def seed_tables():
         ),
         Expense( 
             amount = 100, 
-            description = "Bag"
+            description = "Bag",
+            trip=trips[0], 
+            category=categories[1]
         )
     ]
 
