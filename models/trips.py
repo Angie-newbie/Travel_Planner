@@ -29,8 +29,8 @@ class Trip(db.Model):
 class TripSchema(ma.Schema):
     id = fields.Int()
     location = fields.Str()
-    arrival_date = fields.Date()
-    departure_date = fields.Date()
+    arrival_date = fields.Date(error_messages={"invalid": "Invalid date format. Use YYYY-MM-DD."})
+    departure_date = fields.Date(error_messages={"invalid": "Invalid date format. Use YYYY-MM-DD."})
     user_id = fields.Int()
     total_expense = fields.Method("get_total_expense")
 

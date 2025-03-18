@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 from sqlalchemy.exc import IntegrityError
 from psycopg2 import errorcodes
+from datetime import datetime
 from init import db
 from models.users import User
 from models.trips import Trip, many_trips, one_trip, trip_without_id
@@ -32,6 +33,41 @@ def create_trip():
         # Get incoming request body(json)
         data = trip_without_id.load(request.json)
 
+        # Custom error handling for missing fields
+        if not data.get('location'):
+            return {"error": "'location' field is required"}, 400
+        if not data.get('arrival_date'):
+            return {"error": "'arrival_date' field is required"}, 400
+        if not data.get('departure_date'):
+            return {"error": "'departure_date' field is required"}, 400
+        if not data.get('user_id'):
+            return {"error": "'user_id' field is required"}, 400
+        
+        # Validate if user_id exists
+        user = User.query.get(data.get('user_id'))
+        if not user:
+            return {"error": "Invalid user_id. User does not exist."}, 400
+        
+        # Parse the dates
+        arrival_date = data['arrival_date']
+        departure_date = data['departure_date']
+
+        # Ensure arrival_date and departure_date are in the correct format
+        if isinstance(arrival_date, str):
+            try:
+                arrival_date = datetime.strptime(arrival_date, '%Y-%m-%d').date()
+            except ValueError:
+                return {"error": "Invalid date format for arrival_date. Use YYYY-MM-DD."}, 400
+        if isinstance(departure_date, str):
+            try:
+                departure_date = datetime.strptime(departure_date, '%Y-%m-%d').date()
+            except ValueError:
+                return {"error": "Invalid date format for departure_date. Use YYYY-MM-DD."}, 400
+
+        # Check that departure_date is after arrival_date
+        if departure_date <= arrival_date:
+            return {"error": "departure_date must be after arrival_date"}, 400
+        
         new_trip = Trip(
             location = data.get('location'),
             departure_date = data.get('departure_date'),
