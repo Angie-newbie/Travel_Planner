@@ -35,7 +35,7 @@ class TripSchema(ma.Schema):
     total_expense = fields.Method("get_total_expense")
 
     def get_total_expense(self, obj):
-        return obj.total_expense
+        return obj.total_expense()
 
 
     class Meta:
