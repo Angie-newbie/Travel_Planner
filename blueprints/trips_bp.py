@@ -92,9 +92,17 @@ def update_trip(trip_id):
         # Fetch trip by id
         stmt = db.select(Trip).filter_by(id = trip_id)
         trip = db.session.scalar(stmt)
+        
         if trip:
             # Get incoming request body
             data = trip_without_id.load(request.json)
+
+            # Validate if user_id exists
+            if 'user_id' in data:
+                user = User.query.get(data['user_id'])
+                if not user:
+                    return {"error": "Invalid user_id. User does not exist."}, 400
+                
             # update the attribute of the trip with the incoming data
             trip.location = data.get('location') or trip.location
             trip.departure_date = data.get('departure_date') or trip.departure_date
