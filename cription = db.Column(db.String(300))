@@ -1,0 +1,48 @@
+[1mdiff --git a/models/expenses.py b/models/expenses.py[m
+[1mindex bed6537..5a2e1d3 100644[m
+[1m--- a/models/expenses.py[m
+[1m+++ b/models/expenses.py[m
+[36m@@ -1,6 +1,7 @@[m
+ from init import db, ma[m
+[31m-from marshmallow_sqlalchemy import fields[m
+ from marshmallow.fields import String, Length[m
+[32m+[m[32mfrom marshmallow import fields[m
+[32m+[m[32mfrom marshmallow_sqlalchemy import SQLAlchemyAutoSchema[m
+ [m
+ class Expense(db.Model):[m
+     __tablename__ = 'expenses'[m
+[36m@@ -11,22 +12,28 @@[m [mclass Expense(db.Model):[m
+     amount = db.Column(db.Float, nullable = False)[m
+     description = db.Column(db.String(300))[m
+ [m
+[31m-    trip_id = db.Column(db.Integer, db.ForeignKey('travel.trips.id'))[m
+[31m-    category_id = db.Column(db.Integer, db.ForeignKey('travel.categories.id'))[m
+[32m+[m[32m    trip_id = db.Column(db.Integer, db.ForeignKey('travel.trips.id'), nullable=False)[m
+[32m+[m[32m    category_id = db.Column(db.Integer, db.ForeignKey('travel.categories.id'), nullable=False)[m
+ [m
+     # Define relationships[m
+[31m-    trip_location = db.relationship("Trip", back_populates="expenses")[m
+[31m-    category = db.relationship("Category", back_populates="expenses")[m
+[32m+[m[32m    trip_location = db.relationship("Trip", back_populates="expenses", lazy="joined")[m
+[32m+[m[32m    category = db.relationship("Category", back_populates="expenses", lazy="joined")[m
+                         [m
+[31m-class ExpenseSchema(ma.Schema):[m
+[32m+[m[32mclass ExpenseSchema(SQLAlchemyAutoSchema):[m
+     description = String(validate=Length(min=2, error="Description must be at least 2 characters"))[m
+ [m
+[32m+[m[32m    # Foreign keys as integers[m
+[32m+[m[32m    trip_id = fields.Int(required=True)[m[41m [m
+[32m+[m[32m    category_id = fields.Int(required=True)[m[41m [m
+[32m+[m
+     # Nested fields[m
+     trip_location = fields.Nested('TripSchema', only=['location'])[m
+     category = fields.Nested('CategorySchema', only=['name'])[m
+[32m+[m[41m    [m
+ [m
+     class Meta:[m
+[31m-        fields = ('id', 'amount', 'description', 'trip_location', 'category')[m
+[32m+[m[32m        model = Expense[m
+[32m+[m[32m        fields = ('id', 'amount', 'description', 'trip_id', 'category_id', 'trip_location', 'category')[m
+ [m
+ one_expense = ExpenseSchema()[m
+ many_expenses = ExpenseSchema(many = True)[m

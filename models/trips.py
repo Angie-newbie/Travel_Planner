@@ -3,7 +3,6 @@ from marshmallow import Schema, fields
 from sqlalchemy.orm import column_property
 from sqlalchemy.sql import func
 from models.expenses import Expense
-from models.users import User
 
 
 
@@ -18,10 +17,10 @@ class Trip(db.Model):
     departure_date = db.Column(db.Date, nullable = False)
 
     # Define relationship with User
-    user_id = db.Column(db.Integer, db.ForeignKey('travel.users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('travel.users.id', ondelete='CASCADE'), nullable=False)
     user = db.relationship('User', back_populates='user_trips')
     # Define relationship with Expense
-    expenses = db.relationship("Expense", back_populates="trip_location",lazy="dynamic")
+    expenses = db.relationship("Expense", back_populates="trip_location",lazy="subquery", cascade='all, delete-orphan')
 
     def total_expense(self):
         return db.session.query(db.func.sum(Expense.amount)).filter(Expense.trip_id == self.id).scalar() or 0

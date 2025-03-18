@@ -2,6 +2,8 @@ from flask import Blueprint, request
 from init import db
 from sqlalchemy.exc import IntegrityError
 from psycopg2 import errorcodes
+from models.trips import Trip
+from models.categories import Category 
 from models.expenses import Expense, one_expense, many_expenses, expense_without_id
 
 expenses_bp = Blueprint('expenses', __name__)
@@ -76,15 +78,36 @@ def create_expense():
         # Get incoming request body(json)
         data = expense_without_id.load(request.json)
 
-        if not data.get('name'):
-            return {"error": "'name' field is required"}, 400
+        if not data.get('amount'):
+            return {"error": "'amount' field is required"}, 400
+
+        if not data.get('category'):
+            return {"error": "'category' field is required"}, 400
+
+        if not data.get('description'):
+            return {"error": "'description' field is required"}, 400
+
+        if not data.get('trip_location'):
+            return {"error": "'trip_location' field is required"}, 400
         
-        # Pre-check if the expense name already exists
-        if is_expense_name_exists(data.get('name')):
-            return {"error": "Expenses name already exists."}, 409
+        # Check if the trip exists
+        trip_id = data['trip_location']
+        trip = Trip.query.get(data['trip_location'])
+        if not trip:
+            return {"error": f"Trip with id {data['trip_location']} does not exist."}, 404
         
+        # Check if the category exists (add this step to ensure consistency)
+        category_id = data['category']
+        category = Category.query.get(category_id)
+        if not category:
+            return {"error": f"Category with id {category_id} does not exist."}, 404
+
+
         new_expense = Expense(
-            name = data.get('name'),
+            amount=data.get('amount'),
+            description=data.get('description'),
+            trip_id=data.get('trip_location'),  
+            category_id=data.get('category')
         )
 
         # Add the instance to the db session

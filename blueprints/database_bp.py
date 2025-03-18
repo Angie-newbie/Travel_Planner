@@ -17,6 +17,11 @@ def create_tables():
 
 @db_bp.cli.command('seed')
 def seed_tables():
+    # User.query.delete()
+    # Category.query.delete()
+    # Trip.query.delete()
+    # Expense.query.delete()
+
     users = [
         User(
             name = 'Mary Jones',
@@ -55,23 +60,24 @@ def seed_tables():
             user_id=1
         )
     ]
+    db.session.add_all(trips)
+    db.session.commit()
 
     expenses = [
         Expense(
             amount = 100, 
             description = "Ramen",
-            trip=trips[0], 
-            category=categories[0]
+            trip_id=1, 
+            category_id=1
         ),
         Expense( 
             amount = 100, 
             description = "Bag",
-            trip=trips[0], 
-            category=categories[1]
+            trip_id=2, 
+            category_id=2
         )
     ]
 
 
-    db.session.add_all(trips)
     db.session.add_all(expenses)
     db.session.commit()

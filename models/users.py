@@ -1,6 +1,7 @@
 from init import db, ma
 from marshmallow_sqlalchemy import fields
 from marshmallow.fields import Email
+from models.trips import Trip 
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -12,7 +13,8 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable = False)
     email = db.Column(db.String(200), nullable = False, unique = True)
 
-    user_trips = db.relationship('Trip', back_populates = 'user')
+     
+    user_trips = db.relationship('Trip', back_populates = 'user', cascade='all, delete-orphan')
                         
 class UserSchema(ma.Schema):
     email = Email(required=True)
