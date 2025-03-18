@@ -26,13 +26,20 @@ class ExpenseSchema(ma.Schema):
     description = String(validate=Length(min=2, error="Description must be at least 2 characters"))
 
     # Foreign keys as integers
-    trip_id = fields.Int(required=True) 
+    # trip_id = fields.Int(required=True) 
     category_id = fields.Int(required=True) 
 
     # Nested fields
-    trip_location = fields.Nested('TripSchema', only=['location'])
+    # trip_location = fields.Nested('TripSchema', only=['location'])
     category = fields.Nested('CategorySchema', only=['name'])
     
+
+     # Define a method to directly return the location
+    trip_location = fields.Method("get_trip_location")
+
+    def get_trip_location(self, obj):
+        # Assuming the Expense model has a relationship to the Trip model
+        return obj.trip_location.location if obj.trip_location else None
 
     class Meta:
         model = Expense

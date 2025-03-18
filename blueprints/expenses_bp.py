@@ -81,33 +81,43 @@ def create_expense():
         if not data.get('amount'):
             return {"error": "'amount' field is required"}, 400
 
-        if not data.get('category'):
+        if not data.get('category_id'):
             return {"error": "'category' field is required"}, 400
 
         if not data.get('description'):
             return {"error": "'description' field is required"}, 400
 
-        if not data.get('trip_location'):
+        if not data.get('trip_id'):
             return {"error": "'trip_location' field is required"}, 400
         
+
+        # data: {
+        #         "amount": 50,
+        #         "category_id": 1,
+        #         "description": "sushi",
+        #         "trip_id": 1
+        #       }
+             
         # Check if the trip exists
-        trip_id = data['trip_location']
-        trip = Trip.query.get(data['trip_location'])
-        if not trip:
-            return {"error": f"Trip with id {data['trip_location']} does not exist."}, 404
+        # trip_id = data['trip_location']
+        # trip = Trip.query.get(data['trip_location'])
+
+        # trip_location = Trip.query.filter_by(id=data.get('trip_id')).first().location
+
+
         
         # Check if the category exists (add this step to ensure consistency)
-        category_id = data['category']
-        category = Category.query.get(category_id)
-        if not category:
-            return {"error": f"Category with id {category_id} does not exist."}, 404
+        # category_id = data['category']
+        # category = Category.query.get(category_id)
+        # if not category:
+        #     return {"error": f"Category with id {category_id} does not exist."}, 404
 
 
         new_expense = Expense(
             amount=data.get('amount'),
             description=data.get('description'),
-            trip_id=data.get('trip_location'),  
-            category_id=data.get('category')
+            trip_id=data.get('trip_id'),  
+            category_id=data.get('category_id')
         )
 
         # Add the instance to the db session

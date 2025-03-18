@@ -63,6 +63,10 @@ def seed_tables():
     db.session.add_all(trips)
     db.session.commit()
 
+    # Retrieve trip ids dynamically
+    japan_trip = Trip.query.filter_by(location='Japan').first()
+    korea_trip = Trip.query.filter_by(location='Korea').first()
+
     expenses = [
         Expense(
             amount = 100, 
