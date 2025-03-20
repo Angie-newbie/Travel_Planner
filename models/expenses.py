@@ -25,12 +25,9 @@ class ExpenseSchema(ma.Schema):
 
     description = String(validate=Length(min=2, error="Description must be at least 2 characters"))
 
-    # Foreign keys as integers
-    # trip_id = fields.Int(required=True) 
     category_id = fields.Int(required=True) 
 
     # Nested fields
-    # trip_location = fields.Nested('TripSchema', only=['location'])
     category = fields.Nested('CategorySchema', only=['name'])
     
 
