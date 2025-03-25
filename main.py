@@ -13,9 +13,8 @@ def create_app():
 
     load_dotenv(override=True)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') 
+    
     db.init_app(app)
     ma.init_app(app)
 
