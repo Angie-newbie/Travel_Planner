@@ -1,5 +1,6 @@
 from init import db, ma
 from marshmallow_sqlalchemy import fields
+from marshmallow import fields
 from marshmallow.fields import Email
 from models.trips import Trip 
 
@@ -17,6 +18,8 @@ class User(db.Model):
     user_trips = db.relationship('Trip', back_populates = 'user', cascade='all, delete-orphan')
                         
 class UserSchema(ma.Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
     email = Email(required=True)
     user_trips = fields.Nested('TripSchema', many=True, only=['location', 'total_expense']) 
 

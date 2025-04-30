@@ -20,11 +20,13 @@ class Expense(db.Model):
     category = db.relationship("Category", back_populates="expenses", lazy="joined")
                         
 class ExpenseSchema(ma.Schema):
+    id = fields.Int(dump_only=True)
 
     amount = fields.Float(required=True)  # Include the amount field explicitly
 
     description = String(validate=Length(min=2, error="Description must be at least 2 characters"))
 
+    trip_id = fields.Int(required=True)
     category_id = fields.Int(required=True) 
 
     # Nested fields
